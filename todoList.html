@@ -63,23 +63,20 @@
 			TodoList
 		</h1>
 		<div class="form_input">
-			<input type="text" placeholder="请输入您的计划" class="add_info">
-			<button class="btn">添加</button>
+			<input type="text" placeholder="请输入您的计划" class="add_info" v-model="todo">
+			<button class="btn" v-on:click="add_info">添加</button>
 		</div>
-		<div class="content">
-			<h3 class="unComplete">未完成　５</h3>
+		<span v-show="false">shdfs</span>
+		<div class="content" v-show="true">
+			<h3 class="unComplete">{{ unComplete }}未完成</h3>
 			<ul>
-				<li><input type="checkbox" class="choose_check"><label >今天撒旦石</label>
-				<a href="#" class="del_list">x</a>
-				</li>
-				<li><input type="checkbox" class="choose_check"><label >今天撒旦石</label>
-				<a href="#" class="del_list">x</a>
-				</li>
-				<li><input type="checkbox" class="choose_check"><label >今天撒旦石</label>
-				<a href="#" class="del_list">x</a>
+				<li v-for="item in filterData"><input type="checkbox" class="choose_check">
+					<label >{{item.title}}</label>
+				<a href="#" class="del_list" v-on:click="del_info(item)">x</a>
 				</li>
 			</ul>
-			<h3 class="unComplete">已完成　５</h3>
+			<hr>
+			<h3 class="Complete">已完成　５</h3>
 			<ul>
 				<li><input type="checkbox" class="choose_check"><label >今天撒旦石</label>
 				<a href="#" class="del_list">x</a>
@@ -92,7 +89,90 @@
 				</li>
 			</ul>
 		</div>
-
 	</div>
+	<script>
+		//lcoalStorage存储
+		var store = {
+			save(key,value){
+				window.localStorage.setItem(key,JSON.stringify(value));
+			},
+			fetch(key){
+				return JSON.parse(window.localStorage.getItem(key))||[];
+			}
+		}
+		var list = store.fetch("storeData");
+		console.log(list)
+		var vm = new Vue({
+			el: ".container",
+			data: {
+				list,
+				todo:'',
+				visibility:"all"
+			},
+			watch: {
+				list: {
+					handler: function(){
+						store.save("storeData",this.list);
+					},
+					deep: true
+				}
+			},
+			methods: {
+				add_info(event) {
+					if (this.todo=='') {return;}
+					this.list.push({
+						title: this.todo,
+						iscomplete: false
+					});
+					this.todo = '';
+				},
+				del_info(item) {
+					var index = this.list.indexOf(item);
+					this.list.splice(index,1)
+				}
+			},
+
+    directives:{
+        "focus":{
+            update(el,binding){
+                if(binding.value){
+                    el.focus();
+                }
+            }
+        }
+    },
+    
+			computed: {
+				unComplete(){
+        			return  this.list.filter(item=>{
+                		return !item.isComplete
+            		}).length;
+        		},
+				filterData() {
+					var filter = {
+						all: function(list) {
+							return list;
+						},
+						Complete: function(list) {
+							return list.filter(item=>{
+								return item.iscomplete;
+							});
+						},
+						unComplete: function(list) {
+							return list.filter(item=>{
+								return !item.iscomplete;
+							});
+						} 
+					}
+					return filter[this.visibility]?filter[this.visibility](list):list;
+				}
+			}
+		});
+		function hashFn(){
+    var hash = window.location.hash.slice(1);
+    vm.visibility = hash;
+}
+hashFn();
+	</script>
 </body>
 </html>
