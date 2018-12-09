@@ -12,10 +12,13 @@
 			text-decoration: none;
 			list-style: none;
 		}
+		a{
+			color: black;
+		}
 		.container{
-			width: 90%;
+			width: 95%;
 			margin: 50px auto 0 auto;
-			min-width: 433px;
+			min-width: 365px;
 		}
 		.header{
 			text-align: center;
@@ -23,7 +26,7 @@
 		}
 		.form_input{
 			margin: 0 auto;
-			width: 60%;
+			width: 95%;
 			/*background-color: red;*/
 			margin-bottom: 126px;
 		}
@@ -38,7 +41,7 @@
 			float: right;
 		}
 		.content{
-			width: 60%;
+			width: 95%;
 			background-color: grey;
 			margin: 0 auto;
 			clear: both;
@@ -55,6 +58,32 @@
 			width: 30px;
 			height: 30px;
 		}
+		.nav{
+			width: 95%;
+			margin: 0 auto 20px auto;
+			border-bottom: 1px solid grey;
+			height: 35px;
+		}
+		.nav_list{
+			width: 70%;
+			float: right;
+		}
+		.nav_btn{
+			float: right;
+			margin: 1px;
+			padding: 1px;
+
+		}
+		.active{
+			border: 1px solid black;
+		}
+		.unComplete{
+			float: left;
+			/*clear: both;*/
+			width: 30%;
+			color: red;
+			/*background-color: blue;*/
+		}
 	</style>
 </head>
 <body>
@@ -66,26 +95,24 @@
 			<input type="text" placeholder="请输入您的计划" class="add_info" v-model="todo">
 			<button class="btn" v-on:click="add_info">添加</button>
 		</div>
-		<span v-show="false">shdfs</span>
-		<div class="content" v-show="true">
-			<h3 class="unComplete">{{ unComplete }}未完成</h3>
+		<div class="nav">
+			<div class="unComplete">{{ unComplete }}个未完成</div>
+			<div class="nav_list">
+				<a href="#Completed" class="nav_btn" v-bind:class="{active:visibility==='Completed'}" >已完成任务</a>
+				<a href="#unCompleted" class="nav_btn" v-bind:class="
+				{active:visibility==='unCompleted'}">未完成任务</a>
+				<a href="#all" class="nav_btn " v-bind:class="{active:visibility!=='unCompleted'&& visibility!=='Completed'}">全部任务</a>
+			</div>
+		</div>
+		<h3>任务列表:</h3>
+		<p v-show="!list.length" style="text-align: center;color: red;font-size: 24px;clear:both;">您还没有添加任何任务</p>
+
+		<div class="content" v-show="list.length">
 			<ul>
-				<li v-for="item in filterData"><input type="checkbox" class="choose_check">
+				<li v-for="item in filterData"><input type="checkbox" class="choose_check" v-model="item.isComplete">
 					<label >{{item.title}}</label>
 				<a href="#" class="del_list" v-on:click="del_info(item)">x</a>
-				</li>
-			</ul>
-			<hr>
-			<h3 class="Complete">已完成　５</h3>
-			<ul>
-				<li><input type="checkbox" class="choose_check"><label >今天撒旦石</label>
-				<a href="#" class="del_list">x</a>
-				</li>
-				<li><input type="checkbox" class="choose_check"><label >今天撒旦石</label>
-				<a href="#" class="del_list">x</a>
-				</li>
-				<li><input type="checkbox" class="choose_check"><label >今天撒旦石</label>
-				<a href="#" class="del_list">x</a>
+				<hr>
 				</li>
 			</ul>
 		</div>
@@ -101,7 +128,6 @@
 			}
 		}
 		var list = store.fetch("storeData");
-		console.log(list)
 		var vm = new Vue({
 			el: ".container",
 			data: {
@@ -122,7 +148,7 @@
 					if (this.todo=='') {return;}
 					this.list.push({
 						title: this.todo,
-						iscomplete: false
+						isComplete: false
 					});
 					this.todo = '';
 				},
@@ -153,12 +179,12 @@
 						all: function(list) {
 							return list;
 						},
-						Complete: function(list) {
+						Completed: function(list) {
 							return list.filter(item=>{
 								return item.iscomplete;
 							});
 						},
-						unComplete: function(list) {
+						unCompleted: function(list) {
 							return list.filter(item=>{
 								return !item.iscomplete;
 							});
@@ -169,10 +195,10 @@
 			}
 		});
 		function hashFn(){
-    var hash = window.location.hash.slice(1);
-    vm.visibility = hash;
-}
-hashFn();
+    		var hash = window.location.hash.slice(1);
+    		vm.visibility = hash;
+		}
+		hashFn();
 	</script>
 </body>
 </html>
